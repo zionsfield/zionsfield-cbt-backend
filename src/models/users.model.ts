@@ -61,6 +61,8 @@ schema.pre("save", async function () {
   return;
 });
 
+schema.index({ name: "text" });
+
 schema.statics.build = (attr: UserAttrs) => {
   return new UserModel(attr);
 };

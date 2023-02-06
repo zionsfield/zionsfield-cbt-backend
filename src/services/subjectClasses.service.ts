@@ -13,7 +13,18 @@ export const getSubjectClasses = async (filter: {
       delete filter[key];
     }
   });
-  return await SubjectClassModel.find(filter);
+  return await SubjectClassModel.find(filter)
+    .sort({
+      subject: "desc",
+    })
+    .populate([
+      {
+        path: "subject",
+      },
+      {
+        path: "class",
+      },
+    ]);
 };
 
 // export const getFreeSubjectClasses = async () => {

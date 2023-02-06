@@ -21,7 +21,7 @@ export const createStudent = async ({
     if (!found) throw new BadRequestError("Subject for Class does not exist");
     if (!found.inUse)
       throw new BadRequestError("No teacher assigned to subject for class");
-    oneClass.add(found.class);
+    oneClass.add(found.class.toString());
   }
 
   if (oneClass.size > 1)

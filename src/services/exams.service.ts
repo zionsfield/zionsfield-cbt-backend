@@ -48,6 +48,17 @@ export const createExam = async ({
   }).save();
 };
 
+export const getExamsByDate = async (date: number) => {
+  const exams = await ExamModel.find({
+    startTime: {
+      $gt: date,
+      $lt: date + 1 * 24 * 60 * 60 * 1000,
+    },
+  });
+  const count = exams.length;
+  return { exams, count };
+};
+
 export const getExamsByTeacher = async (teacher: string) => {
   return await ExamModel.find({
     teacher,

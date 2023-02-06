@@ -43,7 +43,7 @@ export const findUsersByFilter = async (
       },
     ],
   });
-  const count = users.length;
+  const count = await UserModel.find({ ...filter, role }).count();
   return { users, count };
 };
 
