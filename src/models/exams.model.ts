@@ -75,6 +75,8 @@ schema.pre("save", async function () {
   return;
 });
 
+schema.index({ name: "text" });
+
 schema.statics.build = (attr: ExamAttrs) => {
   return new ExamModel(attr);
 };

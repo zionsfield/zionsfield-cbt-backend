@@ -10,9 +10,6 @@ export const createTeacherSchema = object({
       1,
       "Email is required"
     ),
-    password: string({ required_error: "Password is required" })
-      .trim()
-      .min(1, "Password is required"),
     subjectClasses: array(objectIdValidator),
   }),
 });

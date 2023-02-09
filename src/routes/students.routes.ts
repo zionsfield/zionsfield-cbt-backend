@@ -5,14 +5,16 @@ import { requireStudent } from "../middlewares/require-student";
 import { requireSuper } from "../middlewares/require-super";
 import { requireTeacher } from "../middlewares/require-teacher";
 import { validateResource } from "../middlewares/validate-resource";
-import { getUsers } from "../services/auth.service";
+import { UserModel } from "../models/users.model";
+import { findUserBy, getUsers } from "../services/auth.service";
 import { createResponse } from "../services/responses.service";
 import {
   createStudent,
   getStudentsSubjectClasses,
+  updateStudent,
 } from "../services/students.service";
 import { querySchema } from "../utils/schemas";
-import { UsersFilter } from "../utils/typings";
+import { UsersFilter } from "../utils/typings.d";
 import {
   CreateResponseInput,
   createResponseSchema,
@@ -73,6 +75,47 @@ router.post(
   async (req: Request<{}, {}, CreateResponseInput>, res: Response) => {
     await createResponse(req.body);
     return res.json({ message: "Response submitted" });
+  }
+);
+
+router.get(
+  "/api/students/:id",
+  requireAuth,
+  requireTeacher,
+  async (req: Request<{ id: string }, {}, {}, {}>, res: Response) => {
+    const user = await findUserBy("_id", req.params.id);
+    return res.json({
+      data: user,
+      message: "Students returned successfully",
+    });
+  }
+);
+
+router.put(
+  "/api/students/:id",
+  requireAuth,
+  requireSuper,
+  async (
+    req: Request<{ id: string }, {}, CreateStudentInput, {}>,
+    res: Response
+  ) => {
+    const updatedStudent = await updateStudent(req.params.id, req.body);
+    return res.json({
+      data: updatedStudent,
+      message: "Student updated successfully",
+    });
+  }
+);
+
+router.delete(
+  "/api/students/:id",
+  requireAuth,
+  requireSuper,
+  async (req: Request<{ id: string }, {}, {}>, res: Response) => {
+    await UserModel.deleteOne({ _id: req.params.id });
+    return res.json({
+      message: "Student deleted successfully",
+    });
   }
 );
 

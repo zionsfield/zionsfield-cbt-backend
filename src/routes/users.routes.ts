@@ -42,7 +42,18 @@ router.get(
     try {
       if (!req.user) return res.json({ data: null });
       const { email, id, role } = req.user;
-      const user = await UserModel.findOne({ email, _id: id, role });
+      const user = await UserModel.findOne({ email, _id: id, role }).populate({
+        path: "subjectClasses",
+        populate: [
+          {
+            path: "class",
+          },
+          {
+            path: "subject",
+            select: "-classes",
+          },
+        ],
+      });
       res.json({ data: user });
     } catch (err: any) {
       return res.json({ data: null });

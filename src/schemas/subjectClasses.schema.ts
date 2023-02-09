@@ -5,7 +5,7 @@ export type SubjectClassAttrs = {
   subject: string;
 };
 
-interface SubjectClassDoc extends Document {
+export interface SubjectClassDoc extends Document {
   class: string;
   subject: string;
   inUse: boolean;

@@ -4,14 +4,21 @@ import { requireAuth } from "../middlewares/require-auth";
 import { requireSuper } from "../middlewares/require-super";
 import { requireTeacher } from "../middlewares/require-teacher";
 import { validateResource } from "../middlewares/validate-resource";
-import { getUsers } from "../services/auth.service";
-import { markExamForStudent } from "../services/responses.service";
+import { UserModel } from "../models/users.model";
+import { findUserBy, getUsers } from "../services/auth.service";
+import {
+  getExamResult,
+  markExamForStudent,
+} from "../services/responses.service";
 import {
   createTeacher,
+  deleteTeacher,
+  getTeachersStudents,
   getTeachersSubjectClasses,
+  updateTeacher,
 } from "../services/teachers.service";
 import { querySchema } from "../utils/schemas";
-import { UsersFilter } from "../utils/typings";
+import { UpdateTeacherDto, UsersFilter } from "../utils/typings.d";
 import {
   CreateTeacherInput,
   createTeacherSchema,
@@ -47,6 +54,20 @@ router.get(
 );
 
 router.get(
+  "/api/teachers/students",
+  requireAuth,
+  requireTeacher,
+  validateResource(querySchema(["userId"])),
+  async (req: Request<{}, {}, {}, { userId: string }>, res: Response) => {
+    const students = await getTeachersStudents(req.query.userId);
+    return res.json({
+      data: { students, count: students.length },
+      message: "Teachers students returned successfully",
+    });
+  }
+);
+
+router.get(
   "/api/teachers/subject-classes",
   requireAuth,
   requireTeacher,
@@ -54,14 +75,14 @@ router.get(
   async (req: Request<{}, {}, {}, { userId: string }>, res: Response) => {
     const subjectClasses = await getTeachersSubjectClasses(req.query.userId);
     return res.json({
-      data: subjectClasses,
+      data: { subjectClasses, count: subjectClasses.length },
       message: "Teachers subject classes returned successfully",
     });
   }
 );
 
 router.get(
-  "/api/teachers/mark-exam",
+  "/api/teachers/results",
   requireAuth,
   requireTeacher,
   validateResource(querySchema(["studentId", "examId"])),
@@ -70,13 +91,70 @@ router.get(
     res: Response
   ) => {
     const { studentId, examId } = req.query;
-    const { correctQuestions, marks } = await markExamForStudent(
-      studentId,
-      examId
-    );
+    const result = await getExamResult(studentId, examId);
     return res.json({
-      data: { correctQuestions, marks },
+      data: result,
       message: "Marked exam for student",
+    });
+  }
+);
+
+router.get(
+  "/api/teachers/students/:subjectClass",
+  requireAuth,
+  requireTeacher,
+  async (req: Request<{ subjectClass: string }, {}, {}, {}>, res: Response) => {
+    const students = await UserModel.find({
+      subjectClasses: req.params.subjectClass,
+      role: Role.STUDENT,
+    });
+    return res.json({
+      data: { students },
+      message: "Teachers students returned successfully",
+    });
+  }
+);
+
+router.get(
+  "/api/teachers/:userId",
+  requireAuth,
+  requireSuper,
+  async (
+    req: Request<{ userId: string }, {}, {}, UsersFilter>,
+    res: Response
+  ) => {
+    const teacher = await findUserBy("_id", req.params.userId);
+    return res.json({
+      data: teacher,
+      message: "Teacher returned successfully",
+    });
+  }
+);
+
+router.put(
+  "/api/teachers/:userId",
+  requireAuth,
+  requireSuper,
+  async (
+    req: Request<{ userId: string }, {}, UpdateTeacherDto>,
+    res: Response
+  ) => {
+    const updatedTeacher = await updateTeacher(req.params.userId, req.body);
+    return res.json({
+      data: updatedTeacher,
+      message: "Teacher updated successfully",
+    });
+  }
+);
+
+router.delete(
+  "/api/teachers/:userId",
+  requireAuth,
+  requireSuper,
+  async (req: Request<{ userId: string }, {}, {}>, res: Response) => {
+    await deleteTeacher(req.params.userId);
+    return res.json({
+      message: "Teacher deleted successfully",
     });
   }
 );
