@@ -137,6 +137,14 @@ export const getExamsByTeacher = async (teacher: string, name?: string) => {
   };
 };
 
+export const getExams = async () => {
+  const exams = await ExamModel.find();
+  return {
+    exams,
+    count: exams.length,
+  };
+};
+
 export const getExamsByStudentAndDate = async (
   student: string,
   date: number
@@ -182,5 +190,8 @@ export const getExamsByStudent = async (student: string, name?: string) => {
   // console.log(filter);
   const exams = await ExamModel.find(filter);
   // console.log(exams);
-  return exams;
+  return {
+    exams,
+    count: exams.length,
+  };
 };

@@ -1,15 +1,13 @@
 import express, { Request, Response } from "express";
-import { NotFoundError } from "../errors/not-found-error";
 import { requireAuth } from "../middlewares/require-auth";
 import { requireStudent } from "../middlewares/require-student";
 import { requireSuper } from "../middlewares/require-super";
 import { requireTeacher } from "../middlewares/require-teacher";
 import { validateResource } from "../middlewares/validate-resource";
-import { ExamModel } from "../models/exams.model";
 import {
   createExam,
   getExamById,
-  getExamsByDate,
+  getExams,
   getExamsByStudent,
   getExamsByStudentAndDate,
   getExamsByTeacher,
@@ -35,30 +33,6 @@ router.post(
 );
 
 router.get(
-  "/api/exams/:examId",
-  requireAuth,
-  requireStudent,
-  async (req: Request<{ examId: string }, {}, {}>, res: Response) => {
-    const exam = await getExamById(req.params.examId);
-    return res.json({ data: exam, message: "Exam returned successfully" });
-  }
-);
-
-router.get(
-  "/api/exams/:date",
-  requireAuth,
-  requireSuper,
-  async (req: Request<{ date: string }>, res: Response) => {
-    const { exams, count, formerExams, formerExamsCount } =
-      await getExamsByDate(new Date(req.params.date).getTime());
-    return res.json({
-      data: { exams, count, formerExams, formerExamsCount },
-      message: "Exams returned successfully",
-    });
-  }
-);
-
-router.get(
   "/api/exams-by-teacher",
   requireAuth,
   requireTeacher,
@@ -75,6 +49,49 @@ router.get(
       data: { exams, count },
       message: "Exams returned successfully",
     });
+  }
+);
+
+router.get(
+  "/api/exams-by-student",
+  requireAuth,
+  requireStudent,
+  validateResource(querySchema(["student"])),
+  async (
+    req: Request<{}, {}, {}, { student: string; name?: string }>,
+    res: Response
+  ) => {
+    const { exams, count } = await getExamsByStudent(
+      req.query.student,
+      req.query.name
+    );
+    return res.json({
+      data: { exams, count },
+      message: "Exams returned successfully",
+    });
+  }
+);
+
+router.get(
+  "/api/exams",
+  requireAuth,
+  requireSuper,
+  async (req: Request<{}>, res: Response) => {
+    const { exams, count } = await getExams();
+    return res.json({
+      data: { exams, count },
+      message: "Exams returned successfully",
+    });
+  }
+);
+
+router.get(
+  "/api/exams/:examId",
+  requireAuth,
+  requireStudent,
+  async (req: Request<{ examId: string }, {}, {}>, res: Response) => {
+    const exam = await getExamById(req.params.examId);
+    return res.json({ data: exam, message: "Exam returned successfully" });
   }
 );
 
@@ -109,20 +126,6 @@ router.get(
       },
       message: "Exams returned successfully",
     });
-  }
-);
-
-router.get(
-  "/api/exams-by-student",
-  requireAuth,
-  requireStudent,
-  validateResource(querySchema(["student"])),
-  async (
-    req: Request<{}, {}, {}, { student: string; name?: string }>,
-    res: Response
-  ) => {
-    const exams = await getExamsByStudent(req.query.student, req.query.name);
-    return res.json({ data: exams, message: "Exams returned successfully" });
   }
 );
 
