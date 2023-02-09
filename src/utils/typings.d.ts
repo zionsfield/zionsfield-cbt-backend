@@ -1,3 +1,5 @@
+import { SubjectClassDoc } from "../schemas/subjectClasses.schema";
+
 export interface Pagination {
   page: number;
   limit?: number;
@@ -12,4 +14,10 @@ export interface IFilter {
 export interface UsersFilter extends IFilter {
   name?: string;
   subjectClasses?: string;
+}
+
+export interface UpdateTeacherDto {
+  name: string;
+  email: string;
+  subjectClasses: SubjectClassDoc[];
 }

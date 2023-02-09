@@ -6,6 +6,7 @@ import { QuestionModel } from "../schemas/questions.schema";
 import { UserModel } from "../models/users.model";
 import { CreateExamInput } from "../validators/exams.validator";
 import { getCurrentTerm } from "./terms.service";
+import { SubjectClassModel } from "../schemas/subjectClasses.schema";
 
 /* Services */
 export const createExam = async ({
@@ -16,6 +17,9 @@ export const createExam = async ({
   duration,
   questionNumber,
 }: CreateExamInput) => {
+  const subjectClassObj = await SubjectClassModel.findById(subjectClass);
+  if (!subjectClassObj || !subjectClassObj.inUse)
+    throw new BadRequestError("Subject Class not found or not in use");
   const questionObjects: string[] = await Promise.all(
     questions.map(async (q) => {
       const question = await QuestionModel.build({
@@ -48,6 +52,30 @@ export const createExam = async ({
   }).save();
 };
 
+export const getExamById = async (examId: string) => {
+  const exam = await ExamModel.findById(examId).populate([
+    {
+      path: "subjectClass",
+      populate: [
+        {
+          path: "subject",
+        },
+        {
+          path: "class",
+        },
+      ],
+    },
+    {
+      path: "term",
+    },
+    {
+      path: "questions",
+    },
+  ]);
+  if (!exam) throw new NotFoundError("Exam");
+  return exam;
+};
+
 export const getExamsByDate = async (date: number) => {
   const exams = await ExamModel.find({
     startTime: {
@@ -55,20 +83,104 @@ export const getExamsByDate = async (date: number) => {
       $lt: date + 1 * 24 * 60 * 60 * 1000,
     },
   });
-  const count = exams.length;
-  return { exams, count };
-};
-
-export const getExamsByTeacher = async (teacher: string) => {
-  return await ExamModel.find({
-    teacher,
+  // const searchDate =
+  const formerExams = await ExamModel.find({
+    startTime: {
+      $lt: date,
+    },
   });
+  const count = exams.length;
+  return { exams, count, formerExams, formerExamsCount: formerExams.length };
 };
 
-export const getExamsByStudent = async (student: string) => {
+export const getExamsByTeacherAndDate = async (
+  teacher: string,
+  date: number
+) => {
+  const exams = await ExamModel.find({
+    teacher,
+    startTime: {
+      $gt: date,
+      $lt: date + 1 * 24 * 60 * 60 * 1000,
+    },
+  });
+  const futureExams = await ExamModel.find({
+    teacher,
+    startTime: {
+      $gt: date + 1 * 24 * 60 * 60 * 1000,
+    },
+  });
+  const formerExams = await ExamModel.find({
+    teacher,
+    startTime: {
+      $lt: date,
+    },
+  });
+  const count = exams.length;
+  return {
+    exams,
+    count,
+    formerExams,
+    formerExamsCount: formerExams.length,
+    futureExams,
+    futureExamsCount: futureExams.length,
+  };
+};
+
+export const getExamsByTeacher = async (teacher: string, name?: string) => {
+  const filter: { [key: string]: any } = { teacher };
+  name && (filter["$text"] = { $search: name });
+  const exams = await ExamModel.find(filter);
+  return {
+    exams,
+    count: exams.length,
+  };
+};
+
+export const getExamsByStudentAndDate = async (
+  student: string,
+  date: number
+) => {
   const studentObj = await UserModel.findById(student);
   if (!studentObj) throw new NotFoundError("Student");
-  return await ExamModel.find({
+  const exams = await ExamModel.find({
     subjectClass: { $in: studentObj.subjectClasses },
+    startTime: {
+      $gt: date,
+      $lt: date + 1 * 24 * 60 * 60 * 1000,
+    },
   });
+  const futureExams = await ExamModel.find({
+    subjectClass: { $in: studentObj.subjectClasses },
+    startTime: {
+      $gt: date + 1 * 24 * 60 * 60 * 1000,
+    },
+  });
+  const formerExams = await ExamModel.find({
+    subjectClass: { $in: studentObj.subjectClasses },
+    startTime: {
+      $lt: date,
+    },
+  });
+  return {
+    exams,
+    count: exams.length,
+    formerExams,
+    formerExamsCount: formerExams.length,
+    futureExams,
+    futureExamsCount: futureExams.length,
+  };
+};
+
+export const getExamsByStudent = async (student: string, name?: string) => {
+  const studentObj = await UserModel.findById(student);
+  if (!studentObj) throw new NotFoundError("Student");
+  const filter: { [key: string]: any } = {
+    subjectClass: { $in: studentObj.subjectClasses },
+  };
+  name && (filter["$text"] = { $search: name });
+  // console.log(filter);
+  const exams = await ExamModel.find(filter);
+  // console.log(exams);
+  return exams;
 };

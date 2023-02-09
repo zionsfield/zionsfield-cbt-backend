@@ -99,7 +99,7 @@ const createUsers = async () => {
   if (users.length === 0) {
     // Call user creation service method
     await createUser(
-      { email: "p@test.com", password: "password", name: "Principal" },
+      { email: "p@test.com", name: "Principal" },
       Role.PRINCIPAL
     );
   }
@@ -113,7 +113,6 @@ const createTeachers = async () => {
     // Call user creation service method
     await createTeacher({
       email: "t1@test.com",
-      password: "password",
       name: "Physics Teacher",
       subjectClasses: subjectClasses.map((s) => s.id),
     });

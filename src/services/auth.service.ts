@@ -5,7 +5,7 @@ import { BadRequestError } from "../errors/bad-request-error";
 import { NotFoundError } from "../errors/not-found-error";
 import { UserPayload } from "../middlewares/current-user";
 import { UserModel } from "../models/users.model";
-import { Pagination, UsersFilter } from "../utils/typings";
+import { Pagination, UsersFilter } from "../utils/typings.d";
 import {
   ChangePasswordInput,
   SigninUserInput,
@@ -15,6 +15,17 @@ import {
 export const findUserBy = async (by: string, value: any) => {
   return await UserModel.findOne({
     [by]: value,
+  }).populate({
+    path: "subjectClasses",
+    populate: [
+      {
+        path: "class",
+      },
+      {
+        path: "subject",
+        select: "-classes",
+      },
+    ],
   });
 };
 
@@ -72,7 +83,7 @@ export const signToken = (user: UserPayload) => {
 };
 
 export const createUser = async (
-  { email, password, name }: SignupUserInput,
+  { email, name }: SignupUserInput,
   role: Role
 ) => {
   const existingUser = await findUserByFilter({ email });
@@ -81,7 +92,7 @@ export const createUser = async (
   const user = await UserModel.build({
     email,
     name,
-    password,
+    password: "password",
     role,
     subjectClasses: [],
   }).save();
