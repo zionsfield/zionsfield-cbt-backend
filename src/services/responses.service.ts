@@ -62,20 +62,27 @@ export const markExamForStudent = async (studentId: string, examId: string) => {
       });
     }
   }
-  console.log(marks);
-  console.log(correctQuestions);
-  console.log(incorrectQuestions);
-  let result: any = await ResultModel.findOne({ studentId, examId });
-  console.log(result);
-  if (!result)
-    result = await ResultModel.build({
-      examId,
-      studentId,
-      marks,
-      correctQuestions,
-      incorrectQuestions,
-    }).save();
-  console.log(result);
+  console.log("marks", marks);
+  console.log("correctQuestions", correctQuestions);
+  console.log("incorrectQuestions", incorrectQuestions);
+  // let result: any = await ResultModel.findOne({ studentId, examId });
+  // console.log("result", result);
+  // if (!result)
+  //   result = await ResultModel.build({
+  //     examId,
+  //     studentId,
+  //     marks,
+  //     correctQuestions,
+  //     incorrectQuestions,
+  //   }).save();
+  const result = await ResultModel.build({
+    examId,
+    studentId,
+    marks,
+    correctQuestions,
+    incorrectQuestions,
+  }).save();
+  console.log("result", result);
   return result;
 };
 

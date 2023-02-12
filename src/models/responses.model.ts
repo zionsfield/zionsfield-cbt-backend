@@ -44,6 +44,8 @@ const schema = new mongoose.Schema(
   }
 );
 
+schema.index({ questionId: 1, studentId: 1 }, { unique: true });
+
 schema.statics.build = (attr: ResponseAttrs) => {
   return new ResponseModel(attr);
 };

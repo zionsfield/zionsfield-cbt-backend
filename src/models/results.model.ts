@@ -60,6 +60,8 @@ const schema = new mongoose.Schema(
   }
 );
 
+schema.index({ examId: 1, studentId: 1 }, { unique: true });
+
 schema.statics.build = (attr: ResultAttrs) => {
   return new ResultModel(attr);
 };
