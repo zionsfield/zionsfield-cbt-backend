@@ -5,7 +5,7 @@ export type ResponseAttrs = {
   examId: string;
   studentId: string;
   questionId: string;
-  optionPicked: string;
+  optionPicked?: string;
 };
 
 export interface ResponseDoc extends Document {

@@ -21,12 +21,25 @@ export const createResponse = async ({ responses }: CreateResponseInput) => {
   const oneExamArr = Array.from(oneExam);
   // if (!oneStudentArr[0] || !oneExamArr[0])
   //   throw new BadRequestError("Responses shouldn't be an empty array");
-  const foundResponses = await ResponseModel.find({
-    examId: oneExamArr[0],
-    studentId: oneStudentArr[0],
-  });
-  console.log("foundResponses", foundResponses);
-  if (foundResponses.length === 0) await ResponseModel.insertMany(responses);
+  for (const { examId, studentId, questionId, optionPicked } of responses) {
+    const foundResponse = await ResponseModel.findOne({
+      questionId,
+      studentId,
+    });
+    if (!foundResponse)
+      await ResponseModel.build({
+        examId,
+        studentId,
+        questionId,
+        optionPicked,
+      }).save();
+  }
+  // const foundResponses = await ResponseModel.find({
+  //   examId: oneExamArr[0],
+  //   studentId: oneStudentArr[0],
+  // });
+  // console.log("foundResponses", foundResponses);
+  // if (foundResponses.length === 0) await ResponseModel.insertMany(responses);
   await markExamForStudent(oneStudentArr[0], oneExamArr[0]);
 };
 
@@ -65,25 +78,17 @@ export const markExamForStudent = async (studentId: string, examId: string) => {
   console.log("marks", marks);
   console.log("correctQuestions", correctQuestions);
   console.log("incorrectQuestions", incorrectQuestions);
-  // let result: any = await ResultModel.findOne({ studentId, examId });
-  // console.log("result", result);
-  // if (!result)
-  //   result = await ResultModel.build({
-  //     examId,
-  //     studentId,
-  //     marks,
-  //     correctQuestions,
-  //     incorrectQuestions,
-  //   }).save();
-  const result = await ResultModel.build({
-    examId,
-    studentId,
-    marks,
-    correctQuestions,
-    incorrectQuestions,
-  }).save();
-  console.log("result", result);
-  return result;
+  const foundResult = await ResultModel.findOne({ studentId, examId });
+  if (!foundResult) {
+    const result = await ResultModel.build({
+      examId,
+      studentId,
+      marks,
+      correctQuestions,
+      incorrectQuestions,
+    }).save();
+    console.log("result", result);
+  }
 };
 
 export const getExamResult = async (studentId: string, examId: string) => {
