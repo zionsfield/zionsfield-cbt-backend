@@ -40,7 +40,7 @@ export const createExam = async ({
   });
   if (!teacher)
     throw new BadRequestError("Exam for subject class has no teacher assigned");
-  return await ExamModel.build({
+  const examDto = {
     name,
     subjectClass,
     questions: questionObjects,
@@ -49,7 +49,9 @@ export const createExam = async ({
     teacher: teacher.id,
     duration,
     questionNumber,
-  }).save();
+  };
+  console.log(examDto);
+  return await ExamModel.build(examDto).save();
 };
 
 export const getExamById = async (examId: string) => {
