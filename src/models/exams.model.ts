@@ -5,7 +5,7 @@ export type ExamAttrs = {
   subjectClass: string;
   questions: string[];
   questionNumber?: number;
-  startTime: string;
+  startTime: Date;
   duration?: number;
   teacher: string;
   term: string;
@@ -67,13 +67,13 @@ const schema = new mongoose.Schema(
   }
 );
 
-schema.pre("save", async function () {
-  if (!this.isModified("startTime")) {
-    return;
-  }
-  this.startTime = new Date(this.startTime);
-  return;
-});
+// schema.pre("save", async function () {
+//   if (!this.isModified("startTime")) {
+//     return;
+//   }
+//   this.startTime = new Date(this.startTime);
+//   return;
+// });
 
 schema.index({ name: "text" });
 

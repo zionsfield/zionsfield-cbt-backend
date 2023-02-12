@@ -44,7 +44,7 @@ export const createExam = async ({
     name,
     subjectClass,
     questions: questionObjects,
-    startTime,
+    startTime: new Date(startTime),
     term: currentTerm.id,
     teacher: teacher.id,
     duration,
