@@ -1,5 +1,5 @@
 import z, { object, string } from "zod";
-import { Types, isValidObjectId } from "mongoose";
+import { isValidObjectId } from "mongoose";
 import { Option, Role } from "../enums";
 
 export const objectIdValidator = z
@@ -28,9 +28,6 @@ export const paramIdSchema = object({
 
 export const querySchema = (fields: string[]) =>
   object({
-    // query: object({
-    //   [field]: objectIdValidator,
-    // }),
     query: object(
       fields.reduce((acc, curr) => {
         return { ...acc, [curr]: objectIdValidator };

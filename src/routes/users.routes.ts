@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 import { cookieName } from "../constants";
-import { Role } from "../enums";
 import { requireAuth } from "../middlewares/require-auth";
 import { validateResource } from "../middlewares/validate-resource";
 import { UserModel } from "../models/users.model";
@@ -28,13 +27,10 @@ router.post(
   }
 );
 
-router.post(
-  "/api/users/signout",
-  async (req: Request<{}, {}, {}, {}>, res: Response) => {
-    res.cookie(cookieName, "", cookieConfig);
-    return res.json({ message: "Signed out successfully" });
-  }
-);
+router.post("/api/users/signout", async (_, res: Response) => {
+  res.cookie(cookieName, "", cookieConfig);
+  return res.json({ message: "Signed out successfully" });
+});
 
 router.get(
   "/api/users/me",

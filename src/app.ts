@@ -1,4 +1,4 @@
-import express, { Request } from "express";
+import express from "express";
 import "express-async-errors";
 import cors, { CorsOptions } from "cors";
 import { NotFoundError } from "./errors/not-found-error";
@@ -52,7 +52,7 @@ app.use(teachersRoutes);
 app.use(termsRoutes);
 app.use(usersRoutes);
 
-app.get("/hello", (req, res) => {
+app.get("/hello", (_, res) => {
   res.json({ msg: "Hello World" });
 });
 

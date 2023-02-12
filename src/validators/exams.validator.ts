@@ -1,4 +1,4 @@
-import { array, number, object, string, TypeOf } from "zod";
+import { array, number, object, TypeOf } from "zod";
 import { objectIdValidator, stringValidator } from "../utils/schemas";
 import { createQuestionSchema } from "./questions.validator";
 

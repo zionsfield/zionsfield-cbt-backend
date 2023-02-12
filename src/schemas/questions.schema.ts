@@ -35,11 +35,10 @@ const schema = new mongoose.Schema(
       required: true,
       enum: Object.values(Option),
     },
-    // examId: { type: mongoose.Types.ObjectId, ref: "Exam", required: true },
   },
   {
     toJSON: {
-      transform(doc, ret) {
+      transform(_, ret) {
         ret.id = ret._id;
         delete ret._id;
         delete ret.__v;

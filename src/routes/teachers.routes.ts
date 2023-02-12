@@ -6,10 +6,7 @@ import { requireTeacher } from "../middlewares/require-teacher";
 import { validateResource } from "../middlewares/validate-resource";
 import { UserModel } from "../models/users.model";
 import { findUserBy, getUsers } from "../services/auth.service";
-import {
-  getExamResult,
-  markExamForStudent,
-} from "../services/responses.service";
+import { getExamResult } from "../services/responses.service";
 import {
   createTeacher,
   deleteTeacher,

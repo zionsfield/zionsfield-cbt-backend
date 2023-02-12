@@ -7,7 +7,7 @@ import { requireTeacher } from "../middlewares/require-teacher";
 import { validateResource } from "../middlewares/validate-resource";
 import { UserModel } from "../models/users.model";
 import { findUserBy, getUsers } from "../services/auth.service";
-import { createResponse } from "../services/responses.service";
+import { createResponse, getExamResult } from "../services/responses.service";
 import {
   createStudent,
   getStudentsSubjectClasses,
@@ -54,6 +54,22 @@ router.get(
 );
 
 router.get(
+  "/api/students-by-subject-class",
+  requireAuth,
+  requireTeacher,
+  async (req: Request<{}, {}, {}, { subjectClass: string }>, res: Response) => {
+    const users = await UserModel.find({
+      subjectClasses: req.query.subjectClass,
+      role: Role.STUDENT,
+    });
+    return res.json({
+      data: users,
+      message: "Students returned successfully",
+    });
+  }
+);
+
+router.get(
   "/api/students/subject-classes",
   requireAuth,
   requireStudent,
@@ -63,6 +79,24 @@ router.get(
     return res.json({
       data: subjectClasses,
       message: "Students subject classes returned successfully",
+    });
+  }
+);
+
+router.get(
+  "/api/students/results",
+  requireAuth,
+  requireStudent,
+  validateResource(querySchema(["studentId", "examId"])),
+  async (
+    req: Request<{}, {}, {}, { studentId: string; examId: string }>,
+    res: Response
+  ) => {
+    const { studentId, examId } = req.query;
+    const result = await getExamResult(studentId, examId);
+    return res.json({
+      data: result,
+      message: "Result for student",
     });
   }
 );

@@ -27,10 +27,6 @@ export const getSubjectClasses = async (filter: {
     ]);
 };
 
-// export const getFreeSubjectClasses = async () => {
-//   return await SubjectClassModel.find({ inUse: false });
-// };
-
 export const addSubjectClass = async (subject: string, classId: string) => {
   return await SubjectClassModel.build({
     subject,

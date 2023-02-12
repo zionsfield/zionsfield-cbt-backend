@@ -1,10 +1,3 @@
-// import {
-//   buildSchema,
-//   modelOptions,
-//   pre,
-//   prop,
-//   Ref,
-// } from "@typegoose/typegoose";
 import mongoose, { Document, Model } from "mongoose";
 import * as argon from "argon2";
 import { Role } from "../enums";
@@ -42,7 +35,7 @@ const schema = new mongoose.Schema(
   {
     timestamps: true,
     toJSON: {
-      transform(doc, ret) {
+      transform(_, ret) {
         ret.id = ret._id;
         delete ret._id;
         delete ret.password;

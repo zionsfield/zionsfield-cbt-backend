@@ -5,7 +5,7 @@ export type ResponseAttrs = {
   examId: string;
   studentId: string;
   questionId: string;
-  optionPicked: Option;
+  optionPicked: string;
 };
 
 export interface ResponseDoc extends Document {
@@ -30,12 +30,12 @@ const schema = new mongoose.Schema(
       ref: "Question",
       required: true,
     },
-    optionPicked: { type: String, required: true, enum: Object.values(Option) },
+    optionPicked: { type: String },
   },
   {
     timestamps: true,
     toJSON: {
-      transform(doc, ret) {
+      transform(_, ret) {
         ret.id = ret._id;
         delete ret._id;
         delete ret.__v;

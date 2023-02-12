@@ -1,10 +1,5 @@
-import { array, number, object, string, TypeOf } from "zod";
-import {
-  objectIdValidator,
-  optionValidator,
-  stringValidator,
-} from "../utils/schemas";
-import { createQuestionSchema } from "./questions.validator";
+import { array, object, string, TypeOf } from "zod";
+import { objectIdValidator } from "../utils/schemas";
 
 export const createResponseSchema = object({
   body: object({
@@ -13,7 +8,7 @@ export const createResponseSchema = object({
         examId: objectIdValidator,
         questionId: objectIdValidator,
         studentId: objectIdValidator,
-        optionPicked: optionValidator,
+        optionPicked: string().optional(),
       })
     ),
   }),

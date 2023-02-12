@@ -120,11 +120,6 @@ export const changePassword = async (
   role: Role
 ) => {
   let user = await findUserByFilter({ _id: userId, role });
-  // if (role === Role.TEACHER) {
-  //   user = await findUserByFilter({ _id: userId, role: Role.TEACHER });
-  // } else {
-  //   user = await findUserByFilter({ _id: userId, role: Role.STUDENT });
-  // }
   if (!user) throw new NotFoundError("User");
   const passwordsMatch = await argon.verify(user.password, oldPsw);
   if (!passwordsMatch) throw new BadRequestError("Password Incorrect");

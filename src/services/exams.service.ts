@@ -25,9 +25,9 @@ export const createExam = async ({
       const question = await QuestionModel.build({
         question: q.question,
         optionA: q.optionA,
-        optionB: q.optionA,
-        optionC: q.optionA,
-        optionD: q.optionA,
+        optionB: q.optionB,
+        optionC: q.optionC,
+        optionD: q.optionD,
         correctOption: q.correctOption,
       }).save();
       return question.id;
@@ -76,61 +76,61 @@ export const getExamById = async (examId: string) => {
   return exam;
 };
 
-export const getExamsByDate = async (date: number) => {
-  const exams = await ExamModel.find({
-    startTime: {
-      $gt: date,
-      $lt: date + 1 * 24 * 60 * 60 * 1000,
-    },
-  });
-  // const searchDate =
-  const formerExams = await ExamModel.find({
-    startTime: {
-      $lt: date,
-    },
-  });
-  const count = exams.length;
-  return { exams, count, formerExams, formerExamsCount: formerExams.length };
-};
+// export const getExamsByDate = async (date: number) => {
+//   const exams = await ExamModel.find({
+//     startTime: {
+//       $gt: date,
+//       $lt: date + 1 * 24 * 60 * 60 * 1000,
+//     },
+//   }).populate("term");
+//   // const searchDate =
+//   const formerExams = await ExamModel.find({
+//     startTime: {
+//       $lt: date,
+//     },
+//   }).populate("term");
+//   const count = exams.length;
+//   return { exams, count, formerExams, formerExamsCount: formerExams.length };
+// };
 
-export const getExamsByTeacherAndDate = async (
-  teacher: string,
-  date: number
-) => {
-  const exams = await ExamModel.find({
-    teacher,
-    startTime: {
-      $gt: date,
-      $lt: date + 1 * 24 * 60 * 60 * 1000,
-    },
-  });
-  const futureExams = await ExamModel.find({
-    teacher,
-    startTime: {
-      $gt: date + 1 * 24 * 60 * 60 * 1000,
-    },
-  });
-  const formerExams = await ExamModel.find({
-    teacher,
-    startTime: {
-      $lt: date,
-    },
-  });
-  const count = exams.length;
-  return {
-    exams,
-    count,
-    formerExams,
-    formerExamsCount: formerExams.length,
-    futureExams,
-    futureExamsCount: futureExams.length,
-  };
-};
+// export const getExamsByTeacherAndDate = async (
+//   teacher: string,
+//   date: number
+// ) => {
+//   const exams = await ExamModel.find({
+//     teacher,
+//     startTime: {
+//       $gt: date,
+//       $lt: date + 1 * 24 * 60 * 60 * 1000,
+//     },
+//   }).populate("term");
+//   const futureExams = await ExamModel.find({
+//     teacher,
+//     startTime: {
+//       $gt: date + 1 * 24 * 60 * 60 * 1000,
+//     },
+//   }).populate("term");
+//   const formerExams = await ExamModel.find({
+//     teacher,
+//     startTime: {
+//       $lt: date,
+//     },
+//   }).populate("term");
+//   const count = exams.length;
+//   return {
+//     exams,
+//     count,
+//     formerExams,
+//     formerExamsCount: formerExams.length,
+//     futureExams,
+//     futureExamsCount: futureExams.length,
+//   };
+// };
 
 export const getExamsByTeacher = async (teacher: string, name?: string) => {
   const filter: { [key: string]: any } = { teacher };
   name && (filter["$text"] = { $search: name });
-  const exams = await ExamModel.find(filter);
+  const exams = await ExamModel.find(filter).populate("term");
   return {
     exams,
     count: exams.length,
@@ -138,47 +138,47 @@ export const getExamsByTeacher = async (teacher: string, name?: string) => {
 };
 
 export const getExams = async () => {
-  const exams = await ExamModel.find();
+  const exams = await ExamModel.find().populate("term");
   return {
     exams,
     count: exams.length,
   };
 };
 
-export const getExamsByStudentAndDate = async (
-  student: string,
-  date: number
-) => {
-  const studentObj = await UserModel.findById(student);
-  if (!studentObj) throw new NotFoundError("Student");
-  const exams = await ExamModel.find({
-    subjectClass: { $in: studentObj.subjectClasses },
-    startTime: {
-      $gt: date,
-      $lt: date + 1 * 24 * 60 * 60 * 1000,
-    },
-  });
-  const futureExams = await ExamModel.find({
-    subjectClass: { $in: studentObj.subjectClasses },
-    startTime: {
-      $gt: date + 1 * 24 * 60 * 60 * 1000,
-    },
-  });
-  const formerExams = await ExamModel.find({
-    subjectClass: { $in: studentObj.subjectClasses },
-    startTime: {
-      $lt: date,
-    },
-  });
-  return {
-    exams,
-    count: exams.length,
-    formerExams,
-    formerExamsCount: formerExams.length,
-    futureExams,
-    futureExamsCount: futureExams.length,
-  };
-};
+// export const getExamsByStudentAndDate = async (
+//   student: string,
+//   date: number
+// ) => {
+//   const studentObj = await UserModel.findById(student);
+//   if (!studentObj) throw new NotFoundError("Student");
+//   const exams = await ExamModel.find({
+//     subjectClass: { $in: studentObj.subjectClasses },
+//     startTime: {
+//       $gt: date,
+//       $lt: date + 1 * 24 * 60 * 60 * 1000,
+//     },
+//   }).populate("term");
+//   const futureExams = await ExamModel.find({
+//     subjectClass: { $in: studentObj.subjectClasses },
+//     startTime: {
+//       $gt: date + 1 * 24 * 60 * 60 * 1000,
+//     },
+//   }).populate("term");
+//   const formerExams = await ExamModel.find({
+//     subjectClass: { $in: studentObj.subjectClasses },
+//     startTime: {
+//       $lt: date,
+//     },
+//   }).populate("term");
+//   return {
+//     exams,
+//     count: exams.length,
+//     formerExams,
+//     formerExamsCount: formerExams.length,
+//     futureExams,
+//     futureExamsCount: futureExams.length,
+//   };
+// };
 
 export const getExamsByStudent = async (student: string, name?: string) => {
   const studentObj = await UserModel.findById(student);
@@ -187,9 +187,7 @@ export const getExamsByStudent = async (student: string, name?: string) => {
     subjectClass: { $in: studentObj.subjectClasses },
   };
   name && (filter["$text"] = { $search: name });
-  // console.log(filter);
-  const exams = await ExamModel.find(filter);
-  // console.log(exams);
+  const exams = await ExamModel.find(filter).populate("term");
   return {
     exams,
     count: exams.length,

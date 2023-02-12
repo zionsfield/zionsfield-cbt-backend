@@ -1,5 +1,4 @@
-import { array, object, string, TypeOf } from "zod";
-import { objectIdValidator, roleValidator } from "../utils/schemas";
+import { object, string, TypeOf } from "zod";
 
 export const signupUserSchema = object({
   body: object({

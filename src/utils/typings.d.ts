@@ -1,3 +1,4 @@
+import { Option } from "../enums";
 import { SubjectClassDoc } from "../schemas/subjectClasses.schema";
 
 export interface Pagination {
@@ -20,4 +21,9 @@ export interface UpdateTeacherDto {
   name: string;
   email: string;
   subjectClasses: SubjectClassDoc[];
+}
+
+export interface CorrectQuestion {
+  questionId: string;
+  optionPicked: Option;
 }

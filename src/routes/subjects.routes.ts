@@ -4,7 +4,6 @@ import { validateResource } from "../middlewares/validate-resource";
 import { SubjectModel } from "../models/subjects.model";
 import { getSubjectClasses } from "../services/subjectClasses.service";
 import { createSubject } from "../services/subjects.service";
-import { querySchema } from "../utils/schemas";
 import {
   CreateSubjectInput,
   createSubjectSchema,

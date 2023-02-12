@@ -44,17 +44,15 @@ const setupSubjects = async () => {
     js1ToSs3 = await ClassModel.find({ level: { $gte: 7 } });
   }
   // JS 1 To JS 3
-  let js1ToJs3 = await ClassModel.find({ level: { $gte: 7, $lt: 10 } });
-  while (js1ToJs3.length < 3) {
-    js1ToJs3 = await ClassModel.find({ level: { $gte: 10 } });
-  }
+  const js1ToJs3 = js1ToSs3.filter((c) => c.level >= 7 && c.level < 10);
   // SS 1 To SS 3
-  let ss1ToSs3 = await ClassModel.find({ level: { $gte: 10 } });
-  while (ss1ToSs3.length < 3) {
-    ss1ToSs3 = await ClassModel.find({ level: { $gte: 10 } });
-  }
+  const ss1ToSs3 = js1ToSs3.filter((c) => c.level >= 10);
 
   const subjectNames = [
+    {
+      name: "Basic Science",
+      classes: js1ToJs3.map((j) => j.id),
+    },
     {
       name: "Mathematics",
       classes: js1ToSs3.map((j) => j.id),
@@ -125,9 +123,8 @@ const loadTestData = async () => {
 
 export const setup = async () => {
   const terms = await getTerms();
-  let term: TermDoc | undefined;
   if (terms.length === 0) {
-    term = await TermModel.build({
+    await TermModel.build({
       term: 2,
       startYear: 2022,
       endYear: 2023,

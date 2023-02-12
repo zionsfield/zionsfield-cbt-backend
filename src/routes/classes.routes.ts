@@ -1,9 +1,6 @@
 import express, { Request, Response } from "express";
 import { NotFoundError } from "../errors/not-found-error";
-import { requireAuth } from "../middlewares/require-auth";
-import { validateResource } from "../middlewares/validate-resource";
 import { ClassModel } from "../models/classes.model";
-import { querySchema } from "../utils/schemas";
 
 const router = express.Router();
 

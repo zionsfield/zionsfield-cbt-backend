@@ -24,7 +24,7 @@ export const createStudent = async ({
     oneClass.add(found.class.toString());
   }
 
-  if (oneClass.size > 1)
+  if (oneClass.size !== 1)
     throw new BadRequestError(
       "Student cannot be in more than one class at a time"
     );
@@ -55,7 +55,7 @@ export const updateStudent = async (
     oneClass.add(found.class.toString());
   }
 
-  if (oneClass.size > 1)
+  if (oneClass.size !== 1)
     throw new BadRequestError(
       "Student cannot be in more than one class at a time"
     );
