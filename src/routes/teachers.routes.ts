@@ -30,7 +30,7 @@ router.post(
   validateResource(createTeacherSchema),
   async (req: Request<{}, {}, CreateTeacherInput>, res: Response) => {
     const { user } = await createTeacher(req.body);
-    return res.json({
+    return res.status(201).json({
       data: { ...user.toJSON() },
       message: "Created teacher successfully",
     });

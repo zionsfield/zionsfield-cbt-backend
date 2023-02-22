@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get("/api/classes", async (req: Request, res: Response) => {
   const classes = await ClassModel.find().sort({ level: "asc" });
-  res.json({ data: classes });
+  return res.json({ data: classes });
 });
 
 router.get(

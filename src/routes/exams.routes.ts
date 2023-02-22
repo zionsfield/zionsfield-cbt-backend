@@ -28,7 +28,9 @@ router.post(
   async (req: Request<{}, {}, CreateExamInput>, res: Response) => {
     console.log(req.body, 30);
     const exam = await createExam(req.body);
-    res.json({ data: exam, message: "Exam created successfully" });
+    return res
+      .status(201)
+      .json({ data: exam, message: "Exam created successfully" });
   }
 );
 

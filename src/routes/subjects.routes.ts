@@ -15,13 +15,13 @@ router
   .route("/api/subjects")
   .get(async (req: Request, res: Response) => {
     const subjects = await SubjectModel.find();
-    res.json({ data: subjects });
+    return res.json({ data: subjects });
   })
   .post(
     validateResource(createSubjectSchema),
     async (req: Request<{}, {}, CreateSubjectInput>, res) => {
       await createSubject(req.body);
-      res.status(201).json({
+      return res.status(201).json({
         data: await SubjectModel.find(),
       });
     }

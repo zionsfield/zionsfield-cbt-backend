@@ -33,7 +33,7 @@ router.post(
   validateResource(createStudentSchema),
   async (req: Request<{}, {}, CreateStudentInput>, res: Response) => {
     const { user } = await createStudent(req.body);
-    return res.json({
+    return res.status(201).json({
       data: { ...user.toJSON() },
       message: "Created student successfully",
     });
@@ -109,7 +109,7 @@ router.post(
   async (req: Request<{}, {}, CreateResponseInput>, res: Response) => {
     console.log("submitting response", req.user?.id);
     await createResponse(req.body);
-    return res.json({ message: "Response submitted" });
+    return res.status(201).json({ message: "Response submitted" });
   }
 );
 
