@@ -19,6 +19,7 @@ export interface ExamDoc extends Document {
   startTime: Date;
   duration: number;
   term: string;
+  rescheduled: boolean;
   teacher: string;
   createdAt: Date;
   updatedAt: Date;
@@ -54,6 +55,7 @@ const schema = new mongoose.Schema(
       type: Number,
       default: 60,
     },
+    rescheduled: { type: Boolean, default: false },
   },
   {
     timestamps: true,
@@ -66,14 +68,6 @@ const schema = new mongoose.Schema(
     },
   }
 );
-
-// schema.pre("save", async function () {
-//   if (!this.isModified("startTime")) {
-//     return;
-//   }
-//   this.startTime = new Date(this.startTime);
-//   return;
-// });
 
 schema.index({ name: "text" });
 

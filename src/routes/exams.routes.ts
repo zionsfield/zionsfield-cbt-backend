@@ -10,6 +10,7 @@ import {
   getExams,
   getExamsByStudent,
   getExamsByTeacher,
+  rescheduleExams,
 } from "../services/exams.service";
 import { querySchema } from "../utils/schemas";
 import {
@@ -75,12 +76,25 @@ router.get(
   "/api/exams",
   requireAuth,
   requireSuper,
-  async (req: Request<{}>, res: Response) => {
+  async (_, res: Response) => {
     const { exams, count } = await getExams();
     return res.json({
       data: { exams, count },
       message: "Exams returned successfully",
     });
+  }
+);
+
+router.patch(
+  "/api/exams/reschedule/:examId",
+  requireAuth,
+  requireTeacher,
+  async (
+    req: Request<{ examId: string }, {}, { newStartTime: string }>,
+    res: Response
+  ) => {
+    await rescheduleExams(req.params.examId, req.body.newStartTime);
+    return res.json({ message: "Exam rescheduled successfully" });
   }
 );
 
@@ -93,73 +107,5 @@ router.get(
     return res.json({ data: exam, message: "Exam returned successfully" });
   }
 );
-
-// router.get(
-//   "/api/exams-by-teacher/:date",
-//   requireAuth,
-//   requireTeacher,
-//   validateResource(querySchema(["teacher"])),
-//   async (
-//     req: Request<{ date: string }, {}, {}, { teacher: string }>,
-//     res: Response
-//   ) => {
-//     const {
-//       exams,
-//       count,
-//       futureExams,
-//       futureExamsCount,
-//       formerExams,
-//       formerExamsCount,
-//     } = await getExamsByTeacherAndDate(
-//       req.query.teacher,
-//       new Date(req.params.date).getTime()
-//     );
-//     return res.json({
-//       data: {
-//         exams,
-//         count,
-//         futureExams,
-//         futureExamsCount,
-//         formerExams,
-//         formerExamsCount,
-//       },
-//       message: "Exams returned successfully",
-//     });
-//   }
-// );
-
-// router.get(
-//   "/api/exams-by-student/:date",
-//   requireAuth,
-//   requireStudent,
-//   validateResource(querySchema(["student"])),
-//   async (
-//     req: Request<{ date: string }, {}, {}, { student: string }>,
-//     res: Response
-//   ) => {
-//     const {
-//       exams,
-//       count,
-//       futureExams,
-//       futureExamsCount,
-//       formerExams,
-//       formerExamsCount,
-//     } = await getExamsByStudentAndDate(
-//       req.query.student,
-//       new Date(req.params.date).getTime()
-//     );
-//     return res.json({
-//       data: {
-//         exams,
-//         count,
-//         futureExams,
-//         futureExamsCount,
-//         formerExams,
-//         formerExamsCount,
-//       },
-//       message: "Exams returned successfully",
-//     });
-//   }
-// );
 
 export { router as examsRoutes };

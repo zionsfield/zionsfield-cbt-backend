@@ -78,57 +78,6 @@ export const getExamById = async (examId: string) => {
   return exam;
 };
 
-// export const getExamsByDate = async (date: number) => {
-//   const exams = await ExamModel.find({
-//     startTime: {
-//       $gt: date,
-//       $lt: date + 1 * 24 * 60 * 60 * 1000,
-//     },
-//   }).populate("term");
-//   // const searchDate =
-//   const formerExams = await ExamModel.find({
-//     startTime: {
-//       $lt: date,
-//     },
-//   }).populate("term");
-//   const count = exams.length;
-//   return { exams, count, formerExams, formerExamsCount: formerExams.length };
-// };
-
-// export const getExamsByTeacherAndDate = async (
-//   teacher: string,
-//   date: number
-// ) => {
-//   const exams = await ExamModel.find({
-//     teacher,
-//     startTime: {
-//       $gt: date,
-//       $lt: date + 1 * 24 * 60 * 60 * 1000,
-//     },
-//   }).populate("term");
-//   const futureExams = await ExamModel.find({
-//     teacher,
-//     startTime: {
-//       $gt: date + 1 * 24 * 60 * 60 * 1000,
-//     },
-//   }).populate("term");
-//   const formerExams = await ExamModel.find({
-//     teacher,
-//     startTime: {
-//       $lt: date,
-//     },
-//   }).populate("term");
-//   const count = exams.length;
-//   return {
-//     exams,
-//     count,
-//     formerExams,
-//     formerExamsCount: formerExams.length,
-//     futureExams,
-//     futureExamsCount: futureExams.length,
-//   };
-// };
-
 export const getExamsByTeacher = async (teacher: string, name?: string) => {
   const filter: { [key: string]: any } = { teacher };
   name && (filter["$text"] = { $search: name });
@@ -147,41 +96,6 @@ export const getExams = async () => {
   };
 };
 
-// export const getExamsByStudentAndDate = async (
-//   student: string,
-//   date: number
-// ) => {
-//   const studentObj = await UserModel.findById(student);
-//   if (!studentObj) throw new NotFoundError("Student");
-//   const exams = await ExamModel.find({
-//     subjectClass: { $in: studentObj.subjectClasses },
-//     startTime: {
-//       $gt: date,
-//       $lt: date + 1 * 24 * 60 * 60 * 1000,
-//     },
-//   }).populate("term");
-//   const futureExams = await ExamModel.find({
-//     subjectClass: { $in: studentObj.subjectClasses },
-//     startTime: {
-//       $gt: date + 1 * 24 * 60 * 60 * 1000,
-//     },
-//   }).populate("term");
-//   const formerExams = await ExamModel.find({
-//     subjectClass: { $in: studentObj.subjectClasses },
-//     startTime: {
-//       $lt: date,
-//     },
-//   }).populate("term");
-//   return {
-//     exams,
-//     count: exams.length,
-//     formerExams,
-//     formerExamsCount: formerExams.length,
-//     futureExams,
-//     futureExamsCount: futureExams.length,
-//   };
-// };
-
 export const getExamsByStudent = async (student: string, name?: string) => {
   const studentObj = await UserModel.findById(student);
   if (!studentObj) throw new NotFoundError("Student");
@@ -194,4 +108,12 @@ export const getExamsByStudent = async (student: string, name?: string) => {
     exams,
     count: exams.length,
   };
+};
+
+export const rescheduleExams = async (examId: string, newStartTime: string) => {
+  const exam = await ExamModel.findById(examId);
+  if (!exam) throw new NotFoundError("Exam");
+  exam.set({ startTime: new Date(newStartTime), rescheduled: true });
+  // exam.name = exam.name + " (rescheduled)";
+  return exam.save();
 };
