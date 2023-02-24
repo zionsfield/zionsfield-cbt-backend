@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { Role } from "../enums";
 import { requireAuth } from "../middlewares/require-auth";
+import { requireStudent } from "../middlewares/require-student";
 import { requireSuper } from "../middlewares/require-super";
 import { requireTeacher } from "../middlewares/require-teacher";
 import { validateResource } from "../middlewares/validate-resource";
@@ -40,7 +41,7 @@ router.post(
 router.get(
   "/api/teachers",
   requireAuth,
-  requireSuper,
+  requireStudent,
   async (req: Request<{}, {}, {}, UsersFilter>, res: Response) => {
     const { users, count } = await getUsers(req.query, Role.TEACHER);
     return res.json({
