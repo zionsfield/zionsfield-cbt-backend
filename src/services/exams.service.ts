@@ -50,7 +50,6 @@ export const createExam = async ({
     duration,
     questionNumber,
   };
-  console.log(examDto);
   return await ExamModel.build(examDto).save();
 };
 
@@ -114,6 +113,5 @@ export const rescheduleExams = async (examId: string, newStartTime: string) => {
   const exam = await ExamModel.findById(examId);
   if (!exam) throw new NotFoundError("Exam");
   exam.set({ startTime: new Date(newStartTime), rescheduled: true });
-  // exam.name = exam.name + " (rescheduled)";
   return exam.save();
 };

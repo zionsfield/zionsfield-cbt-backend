@@ -1,8 +1,9 @@
 import { CookieOptions } from "express";
+import { refreshTokenExpiry } from "../constants";
 import { Role } from "../enums";
 import { ClassModel } from "../models/classes.model";
 import { SubjectModel } from "../models/subjects.model";
-import { TermDoc, TermModel } from "../models/terms.model";
+import { TermModel } from "../models/terms.model";
 import { UserModel } from "../models/users.model";
 import { SubjectClassModel } from "../schemas/subjectClasses.schema";
 import { createUser } from "../services/auth.service";
@@ -139,7 +140,7 @@ export const setup = async () => {
 
 const cookieConfig: CookieOptions = {
   signed: false,
-  expires: new Date(Date.now() + 18 * 60 * 60 * 1000),
+  expires: new Date(Date.now() + refreshTokenExpiry * 1000),
 };
 if (process.env.NODE_ENV === "production") {
   cookieConfig.secure = true;

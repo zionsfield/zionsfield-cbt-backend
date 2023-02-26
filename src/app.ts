@@ -11,6 +11,7 @@ import { usersRoutes } from "./routes/users.routes";
 import { teachersRoutes } from "./routes/teachers.routes";
 import { studentsRoutes } from "./routes/students.routes";
 import { examsRoutes } from "./routes/exams.routes";
+import { authRoutes } from "./routes/auth.routes";
 
 const app = express();
 app.set("trust proxy", true);
@@ -39,6 +40,8 @@ const corsOption: CorsOptions = {
   exposedHeaders: ["Set-Cookie"],
 };
 app.use(cors(corsOption));
+
+app.use(authRoutes);
 
 app.use(currentUser);
 

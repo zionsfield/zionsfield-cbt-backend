@@ -6,50 +6,36 @@ import { UserModel } from "../models/users.model";
 import {
   ChangePasswordInput,
   changePasswordSchema,
-  SigninUserInput,
-  signinUserSchema,
 } from "../validators/users.validator";
-import { changePassword, signin } from "../services/auth.service";
+import { changePassword, getCurrentUser } from "../services/auth.service";
 import { cookieConfig } from "../utils";
 
 const router = express.Router();
 
 router.post(
-  "/api/users/signin",
-  validateResource(signinUserSchema),
-  async (req: Request<{}, {}, SigninUserInput>, res: Response) => {
-    const { user, access_token } = await signin(req.body);
-    res.cookie(cookieName, access_token, cookieConfig);
-    return res.json({
-      data: { ...user.toJSON(), access_token },
-      message: "Signed in successfully",
-    });
+  "/api/users/signout",
+  requireAuth,
+  async (req: Request, res: Response) => {
+    await UserModel.updateOne(
+      { _id: req.user!.id },
+      {
+        $set: {
+          refreshToken: "",
+          refreshTokenExpiry: new Date(),
+        },
+      }
+    );
+    res.cookie(cookieName, "", cookieConfig);
+    return res.json({ message: "Signed out successfully" });
   }
 );
-
-router.post("/api/users/signout", async (_, res: Response) => {
-  res.cookie(cookieName, "", cookieConfig);
-  return res.json({ message: "Signed out successfully" });
-});
 
 router.get(
   "/api/users/me",
   async (req: Request<{}, {}, {}, {}>, res: Response) => {
     try {
       if (!req.user) return res.json({ data: null });
-      const { email, id, role } = req.user;
-      const user = await UserModel.findOne({ email, _id: id, role }).populate({
-        path: "subjectClasses",
-        populate: [
-          {
-            path: "class",
-          },
-          {
-            path: "subject",
-            select: "-classes",
-          },
-        ],
-      });
+      const user = await getCurrentUser(req.user);
       res.json({ data: user });
     } catch (err: any) {
       return res.json({ data: null });
