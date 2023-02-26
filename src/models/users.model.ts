@@ -16,6 +16,8 @@ interface UserDoc extends Document {
   password: string;
   role: string;
   subjectClasses: string[];
+  refreshToken: string;
+  refreshTokenExpiry: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,6 +33,8 @@ const schema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     role: { type: String, required: true, enum: Object.values(Role) },
     subjectClasses: { type: [mongoose.Types.ObjectId], ref: "SubjectClass" },
+    refreshToken: { type: String },
+    refreshTokenExpiry: { type: Date },
   },
   {
     timestamps: true,

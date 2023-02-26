@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { cookieName } from "../constants";
 import { Role } from "../enums";
+import { AccessTokenError } from "../errors/access-token-error";
 
 export interface UserPayload {
   email: string;
@@ -40,8 +41,8 @@ export const currentUser = async (
   try {
     const payload = jwt.verify(token, process.env.JWT_KEY!) as UserPayload;
     req.user = payload;
-  } catch (err) {
-  } finally {
-    next();
+  } catch (error) {
+    throw new AccessTokenError("jwt expired");
   }
+  next();
 };

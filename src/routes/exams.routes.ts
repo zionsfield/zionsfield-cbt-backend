@@ -26,7 +26,6 @@ router.post(
   requireTeacher,
   validateResource(createExamSchema),
   async (req: Request<{}, {}, CreateExamInput>, res: Response) => {
-    console.log(req.body, 30);
     const exam = await createExam(req.body);
     return res
       .status(201)

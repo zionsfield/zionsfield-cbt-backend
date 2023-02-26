@@ -107,7 +107,6 @@ router.post(
   requireStudent,
   validateResource(createResponseSchema),
   async (req: Request<{}, {}, CreateResponseInput>, res: Response) => {
-    console.log("submitting response", req.user?.id);
     await createResponse(req.body);
     return res.status(201).json({ message: "Response submitted" });
   }

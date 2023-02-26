@@ -1,5 +1,6 @@
 import * as argon from "argon2";
 import jwt from "jsonwebtoken";
+import { accessTokenExpiry, refreshTokenExpiry } from "../constants";
 import { Role } from "../enums";
 import { BadRequestError } from "../errors/bad-request-error";
 import { NotFoundError } from "../errors/not-found-error";
@@ -74,10 +75,11 @@ export const getUsers = async (filter: UsersFilter, role: Role) => {
 };
 
 /* Services */
-export const signToken = (user: UserPayload) => {
+export const signToken = (user: UserPayload, expiresIn = accessTokenExpiry) => {
   const userJwt = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_KEY!
+    process.env.JWT_KEY!,
+    { expiresIn }
   );
   return userJwt;
 };
@@ -111,7 +113,51 @@ export const signin = async ({ email, password }: SigninUserInput) => {
     id: user._id,
     role: user.role as unknown as Role,
   });
-  return { access_token, user };
+  const refresh_token = signToken(
+    {
+      email: user.email,
+      id: user._id,
+      role: user.role as unknown as Role,
+    },
+    refreshTokenExpiry
+  );
+  user.refreshToken = refresh_token;
+  user.refreshTokenExpiry = new Date(Date.now() + refreshTokenExpiry * 1000);
+  await user.save();
+  return { access_token, user, refresh_token };
+};
+
+export const refreshAccessToken = async (refreshToken: string) => {
+  try {
+    const user = await UserModel.findOne({ refreshToken });
+    if (!user) throw new NotFoundError("User");
+    const payload = jwt.verify(
+      refreshToken,
+      process.env.JWT_KEY!
+    ) as UserPayload;
+
+    const access_token = signToken(payload);
+    return { access_token, user };
+  } catch (error) {
+    return false;
+  }
+};
+
+export const getCurrentUser = async (userPayload: UserPayload) => {
+  const { email, id, role } = userPayload;
+  const user = await UserModel.findOne({ email, _id: id, role }).populate({
+    path: "subjectClasses",
+    populate: [
+      {
+        path: "class",
+      },
+      {
+        path: "subject",
+        select: "-classes",
+      },
+    ],
+  });
+  return user;
 };
 
 export const changePassword = async (

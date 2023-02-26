@@ -11,16 +11,12 @@ import { Option } from "../enums";
 export const createResponse = async ({ responses }: CreateResponseInput) => {
   const oneStudent = new Set(responses.map((r) => r.studentId));
   const oneExam = new Set(responses.map((r) => r.examId));
-  console.log("oneStudent", oneStudent);
-  console.log("oneExam", oneExam);
   if (oneStudent.size !== 1 || oneExam.size !== 1)
     throw new BadRequestError(
       "Responses shouldn't be an empty array or Responses can only be sent for one student and exam only"
     );
   const oneStudentArr = Array.from(oneStudent);
   const oneExamArr = Array.from(oneExam);
-  // if (!oneStudentArr[0] || !oneExamArr[0])
-  //   throw new BadRequestError("Responses shouldn't be an empty array");
   for (const { examId, studentId, questionId, optionPicked } of responses) {
     const foundResponse = await ResponseModel.findOne({
       questionId,
@@ -34,12 +30,6 @@ export const createResponse = async ({ responses }: CreateResponseInput) => {
         optionPicked,
       }).save();
   }
-  // const foundResponses = await ResponseModel.find({
-  //   examId: oneExamArr[0],
-  //   studentId: oneStudentArr[0],
-  // });
-  // console.log("foundResponses", foundResponses);
-  // if (foundResponses.length === 0) await ResponseModel.insertMany(responses);
   await markExamForStudent(oneStudentArr[0], oneExamArr[0]);
 };
 
@@ -55,7 +45,6 @@ export const markExamForStudent = async (studentId: string, examId: string) => {
   let marks = 0;
   const correctQuestions = [];
   const incorrectQuestions = [];
-  console.log("responses", responses);
   for (const { questionId, optionPicked } of responses) {
     const question = questions.find(
       (q) => q.id.toString() === questionId.toString()
@@ -75,9 +64,6 @@ export const markExamForStudent = async (studentId: string, examId: string) => {
       });
     }
   }
-  console.log("marks", marks);
-  console.log("correctQuestions", correctQuestions);
-  console.log("incorrectQuestions", incorrectQuestions);
   const foundResult = await ResultModel.findOne({ studentId, examId });
   if (!foundResult) {
     const result = await ResultModel.build({
@@ -87,7 +73,6 @@ export const markExamForStudent = async (studentId: string, examId: string) => {
       correctQuestions,
       incorrectQuestions,
     }).save();
-    console.log("result", result);
   }
 };
 
