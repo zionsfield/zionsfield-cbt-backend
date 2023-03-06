@@ -1,5 +1,10 @@
 import express, { Request, Response } from "express";
-import { cookieName } from "../constants";
+import {
+  accessTokenExpiry,
+  cookieName,
+  refreshTokenCookieName,
+  refreshTokenExpiry,
+} from "../constants";
 import { requireAuth } from "../middlewares/require-auth";
 import { validateResource } from "../middlewares/validate-resource";
 import { UserModel } from "../models/users.model";
@@ -25,7 +30,8 @@ router.post(
         },
       }
     );
-    res.cookie(cookieName, "", cookieConfig);
+    res.cookie(cookieName, "", cookieConfig(accessTokenExpiry));
+    res.cookie(refreshTokenCookieName, "", cookieConfig(refreshTokenExpiry));
     return res.json({ message: "Signed out successfully" });
   }
 );
@@ -52,7 +58,8 @@ router.patch(
     res: Response
   ) => {
     await changePassword(req.body, req.user!.id, req.user!.role);
-    res.cookie(cookieName, "", cookieConfig);
+    res.cookie(cookieName, "", cookieConfig(accessTokenExpiry));
+    res.cookie(refreshTokenCookieName, "", cookieConfig(refreshTokenExpiry));
     return res.json({ message: "Password changed successfully" });
   }
 );

@@ -1,5 +1,10 @@
 import express, { Request, Response } from "express";
-import { cookieName } from "../constants";
+import {
+  accessTokenExpiry,
+  cookieName,
+  refreshTokenCookieName,
+  refreshTokenExpiry,
+} from "../constants";
 import { requireAuth } from "../middlewares/require-auth";
 import {
   addTerm,
@@ -19,7 +24,8 @@ router
   })
   .post(requireAuth, async (req: Request, res: Response) => {
     await addTerm();
-    res.cookie(cookieName, "", cookieConfig);
+    res.cookie(cookieName, "", cookieConfig(accessTokenExpiry));
+    res.cookie(refreshTokenCookieName, "", cookieConfig(refreshTokenExpiry));
     return res.status(201).json({ message: "Term added" });
   })
   .delete(requireAuth, async (_, res: Response) => {

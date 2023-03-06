@@ -1,5 +1,9 @@
-import { CookieOptions } from "express";
-import { refreshTokenExpiry } from "../constants";
+import { CookieOptions, Request } from "express";
+import {
+  cookieName,
+  refreshTokenCookieName,
+  refreshTokenExpiry,
+} from "../constants";
 import { Role } from "../enums";
 import { ClassModel } from "../models/classes.model";
 import { SubjectModel } from "../models/subjects.model";
@@ -138,14 +142,44 @@ export const setup = async () => {
   process.env.NODE_ENV === "development" && (await loadTestData());
 };
 
-const cookieConfig: CookieOptions = {
-  signed: false,
-  expires: new Date(Date.now() + refreshTokenExpiry * 1000),
+export const cookieExtractor = (req: Request) => {
+  let token = null;
+  let refreshToken = null;
+  if (req.headers.cookie) {
+    for (let ck of req.headers.cookie.split("; ")) {
+      if (ck.split("=")[0] === cookieName) {
+        token = ck.split("=")[1];
+      }
+      if (ck.split("=")[0] === refreshTokenCookieName) {
+        refreshToken = ck.split("=")[1];
+      }
+    }
+  }
+  return { token, refreshToken };
 };
-if (process.env.NODE_ENV === "production") {
-  cookieConfig.secure = true;
-  cookieConfig.sameSite = "none";
-} else {
-  cookieConfig.sameSite = false;
-}
+
+const cookieConfig = (expiry: number): CookieOptions => {
+  const config: CookieOptions = {
+    signed: false,
+    expires: new Date(Date.now() + expiry * 1000),
+  };
+  if (process.env.NODE_ENV === "production") {
+    config.secure = true;
+    config.sameSite = "none";
+  } else {
+    config.sameSite = false;
+  }
+  return config;
+};
+
+// const cookieConfig: CookieOptions = {
+//   signed: false,
+//   expires: new Date(Date.now() + refreshTokenExpiry * 1000),
+// };
+// if (process.env.NODE_ENV === "production") {
+//   cookieConfig.secure = true;
+//   cookieConfig.sameSite = "none";
+// } else {
+//   cookieConfig.sameSite = false;
+// }
 export { cookieConfig };
