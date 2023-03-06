@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { cookieName } from "../constants";
+import { cookieName, refreshTokenCookieName } from "../constants";
 import { Role } from "../enums";
 import { AccessTokenError } from "../errors/access-token-error";
+import { cookieExtractor } from "../utils";
 
 export interface UserPayload {
   email: string;
@@ -23,20 +24,10 @@ export const currentUser = async (
   res: Response,
   next: NextFunction
 ) => {
-  const cookieExtractor = (req: Request) => {
-    let token = null;
-    if (req.headers.cookie) {
-      for (let ck of req.headers.cookie.split("; ")) {
-        if (ck.split("=")[0] === cookieName) {
-          token = ck.split("=")[1];
-        }
-      }
-    }
-    return token;
-  };
-  const token = cookieExtractor(req);
+  const { token, refreshToken } = cookieExtractor(req);
+  if (!refreshToken) return next();
   if (!token) {
-    return next();
+    throw new AccessTokenError("jwt expired");
   }
   try {
     const payload = jwt.verify(token, process.env.JWT_KEY!) as UserPayload;
