@@ -80,3 +80,8 @@ export const getExamResult = async (studentId: string, examId: string) => {
   let result = await ResultModel.findOne({ studentId, examId });
   return result;
 };
+
+export const getExamResults = async (examId: string) => {
+  const results = await ResultModel.find({ examId }).populate("studentId");
+  return results;
+};

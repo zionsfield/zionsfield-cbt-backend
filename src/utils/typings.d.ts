@@ -27,3 +27,8 @@ export interface CorrectQuestion {
   questionId: string;
   optionPicked: Option;
 }
+
+export interface TeacherResult {
+  name: string;
+  marks?: number;
+}
