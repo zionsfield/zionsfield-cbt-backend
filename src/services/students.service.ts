@@ -81,3 +81,20 @@ export const getStudentsSubjectClasses = async (userId: string) => {
   });
   return student?.subjectClasses;
 };
+
+export const blockStudentById = async (userId: string, block: boolean) => {
+  await UserModel.updateOne(
+    { _id: userId, role: Role.STUDENT },
+    { $set: { blocked: block } }
+  );
+};
+
+export const blockStudentBySubjectClass = async (
+  subjectClass: string,
+  block: boolean
+) => {
+  await UserModel.updateMany(
+    { subjectClasses: subjectClass, role: Role.STUDENT },
+    { $set: { blocked: block } }
+  );
+};

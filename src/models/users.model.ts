@@ -18,6 +18,7 @@ interface UserDoc extends Document {
   subjectClasses: string[];
   refreshToken: string;
   refreshTokenExpiry: Date;
+  blocked: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -35,6 +36,7 @@ const schema = new mongoose.Schema(
     subjectClasses: { type: [mongoose.Types.ObjectId], ref: "SubjectClass" },
     refreshToken: { type: String },
     refreshTokenExpiry: { type: Date },
+    blocked: { type: Boolean },
   },
   {
     timestamps: true,

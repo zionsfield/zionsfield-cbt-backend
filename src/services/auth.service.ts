@@ -108,6 +108,10 @@ export const signin = async ({ email, password }: SigninUserInput) => {
   const passwordsMatch = await argon.verify(user.password, password);
 
   if (!passwordsMatch) throw new BadRequestError("Credentials Incorrect");
+  if (user.blocked)
+    throw new BadRequestError(
+      "You're not allowed to login. Contact your subject teacher"
+    );
   const access_token = signToken({
     email: user.email,
     id: user._id,

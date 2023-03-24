@@ -9,6 +9,8 @@ import { UserModel } from "../models/users.model";
 import { findUserBy, getUsers } from "../services/auth.service";
 import { createResponse, getExamResult } from "../services/responses.service";
 import {
+  blockStudentById,
+  blockStudentBySubjectClass,
   createStudent,
   getStudentsSubjectClasses,
   updateStudent,
@@ -109,6 +111,32 @@ router.post(
   async (req: Request<{}, {}, CreateResponseInput>, res: Response) => {
     await createResponse(req.body);
     return res.status(201).json({ message: "Response submitted" });
+  }
+);
+
+router.patch(
+  "/api/students/block",
+  requireAuth,
+  requireTeacher,
+  async (
+    req: Request<{}, {}, { block: boolean }, { id: string }>,
+    res: Response
+  ) => {
+    await blockStudentById(req.query.id, req.body.block);
+    return res.json({ message: "Student blocked" });
+  }
+);
+
+router.patch(
+  "/api/students/block-all",
+  requireAuth,
+  requireTeacher,
+  async (
+    req: Request<{}, {}, { block: boolean }, { subjectClass: string }>,
+    res: Response
+  ) => {
+    await blockStudentBySubjectClass(req.query.subjectClass, req.body.block);
+    return res.json({ message: "Students blocked" });
   }
 );
 
